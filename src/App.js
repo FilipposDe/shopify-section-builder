@@ -179,6 +179,7 @@ function App() {
 
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const [blockType, setBlockType] = React.useState("column-with-text");
+  const [blockSettings, setBlockSettings] = React.useState([]);
 
   const getResult = () => {
     // Normalize CSS data
@@ -239,7 +240,7 @@ function App() {
     result += `<section className='section-${state?.section?.className}'>\n`;
     // - - Section content
     for (const setting of contentSectionSettings) {
-      result += `  <div class="custom-${setting.id}">${setting.effect.code}</div>\n`;
+      result += `  <div className="custom-${setting.id}">${setting.effect.code}</div>\n`;
     }
     // - - End section content
     result += "</section>\n";
@@ -261,9 +262,21 @@ function App() {
 
   function addBlock(e) {
     e.preventDefault();
-    dispatch({ type: "ADD_SECTION_BLOCK", payload: { type: blockType } });
+    dispatch({
+      type: "ADD_SECTION_BLOCK",
+      payload: { type: blockType, settings: blockSettings },
+    });
   }
 
+  function toggleBlockSetting(isChecked, settingData) {
+    if (isChecked) {
+      setBlockSettings([...blockSettings, settingData]);
+    } else {
+      setBlockSettings(
+        blockSettings.filter((setting) => setting.id !== settingData.id)
+      );
+    }
+  }
   // Schema
   const resultJson = {
     name: state?.section?.name,
@@ -286,51 +299,204 @@ function App() {
 
   return (
     <>
-      <div className="Polaris-Page">
-        <div className="Polaris-Page__Content">
-          <div className="Polaris-Layout">
-            <div className="Polaris-Layout__AnnotatedSection">
-              <div className="Polaris-Layout__AnnotationWrapper">
-                <div className="Polaris-Layout__Annotation">
-                  <div className="Polaris-TextContainer">
-                    <h2 className="Polaris-Heading">Form</h2>
-                    <p>A sample form using Polaris components.</p>
+      <div>
+        <div className="Polaris-Page Polaris-Page--fullWidth">
+          <div className="Polaris-Page-Header Polaris-Page-Header--hasActionMenu Polaris-Page-Header--mobileView Polaris-Page-Header--noBreadcrumbs Polaris-Page-Header--mediumTitle">
+            <div className="Polaris-Page-Header__Row">
+              <div className="Polaris-Page-Header__TitleWrapper">
+                <div>
+                  <div className="Polaris-Header-Title__TitleAndSubtitleWrapper">
+                    <h1 className="Polaris-Header-Title">
+                      Build your own section
+                    </h1>
                   </div>
                 </div>
-                <div className="Polaris-Layout__AnnotationContent">
-                  <div className="Polaris-Card">
-                    <div className="Polaris-Card__Section">
-                      <div className="Polaris-FormLayout">
-                        <div role="group" className="">
-                          <div className="Polaris-FormLayout__Items">
-                            <div className="Polaris-FormLayout__Item">
-                              <div className="">
-                                <div className="Polaris-Labelled__LabelWrapper">
-                                  <div className="Polaris-Label">
-                                    <label
-                                      id="TextField1Label"
-                                      htmlFor="TextField1"
-                                      className="Polaris-Label__Text"
-                                    >
-                                      Section name
-                                    </label>
+              </div>
+            </div>
+          </div>
+          <div className="Polaris-Page__Content">
+            <div className="Polaris-Layout">
+              <div className="Polaris-Layout__Section Polaris-Layout__Section--oneHalf">
+                <div className="Polaris-Card">
+                  <div className="Polaris-Card__Header">
+                    <h2 className="Polaris-Heading">Configure section</h2>
+                  </div>
+                  {/* ================================ */}
+                  {/* Main */}
+                  {/* ================================ */}
+                  <div className="Polaris-Card__Section">
+                    <div className="Polaris-Card__SectionHeader">
+                      <h3 aria-label="Reports" className="Polaris-Subheading">
+                        General
+                      </h3>
+                    </div>
+                    <div className="Polaris-FormLayout">
+                      <div
+                        role="group"
+                        className="Polaris-FormLayout--condensed"
+                      >
+                        <div className="Polaris-FormLayout__Items">
+                          <div className="Polaris-FormLayout__Item">
+                            <div className="">
+                              <div className="Polaris-Labelled__LabelWrapper">
+                                <div className="Polaris-Label">
+                                  <label
+                                    htmlFor="section-name-input"
+                                    className="Polaris-Label__Text"
+                                  >
+                                    Section name
+                                  </label>
+                                </div>
+                              </div>
+                              <div className="Polaris-Connected">
+                                <div className="Polaris-Connected__Item Polaris-Connected__Item--primary">
+                                  <div className="Polaris-TextField">
+                                    <input
+                                      id="section-name-input"
+                                      autocomplete="off"
+                                      className="Polaris-TextField__Input"
+                                      placeholder="Featured"
+                                      type="text"
+                                      value={state?.section?.name}
+                                      onChange={(e) =>
+                                        dispatch({
+                                          type: "SET_NAME",
+                                          payload: e.target.value,
+                                        })
+                                      }
+                                    />
+                                    <div className="Polaris-TextField__Backdrop"></div>
                                   </div>
                                 </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* ================================ */}
+                  {/* Section settings */}
+                  {/* ================================ */}
+
+                  <div className="Polaris-Card__Section">
+                    <div className="Polaris-Card__SectionHeader">
+                      <h3 aria-label="Reports" className="Polaris-Subheading">
+                        Section settings
+                      </h3>
+                    </div>
+                    <div className="Polaris-FormLayout">
+                      <div
+                        role="group"
+                        className="Polaris-FormLayout--condensed"
+                      >
+                        <div className="Polaris-FormLayout__Item">
+                          <fieldset className="Polaris-ChoiceList">
+                            <legend className="Polaris-ChoiceList__Title">
+                              Choose available settings for the section
+                            </legend>
+                            <ul className="Polaris-ChoiceList__Choices">
+                              {presetSectionSettings.map((setting) => {
+                                return (
+                                  <li key={setting.id}>
+                                    <div>
+                                      <label
+                                        className="Polaris-Choice"
+                                        htmlFor={`section-setting-${setting.id}`}
+                                      >
+                                        <span className="Polaris-Choice__Control">
+                                          <span className="Polaris-Checkbox">
+                                            <input
+                                              type="checkbox"
+                                              className="Polaris-Checkbox__Input"
+                                              id={`section-setting-${setting.id}`}
+                                              checked={state?.section?.settings.some(
+                                                (existingSetting) =>
+                                                  existingSetting.id ===
+                                                  setting.id
+                                              )}
+                                              onChange={(e) =>
+                                                toggleSectionSetting(
+                                                  e.target.checked,
+                                                  setting
+                                                )
+                                              }
+                                            />
+                                            <span className="Polaris-Checkbox__Backdrop Polaris-Checkbox--hover"></span>
+                                            <span className="Polaris-Checkbox__Icon">
+                                              <span className="Polaris-Icon">
+                                                <span className="Polaris-VisuallyHidden"></span>
+                                                <svg
+                                                  viewBox="0 0 20 20"
+                                                  className="Polaris-Icon__Svg"
+                                                  focusable="false"
+                                                  aria-hidden="true"
+                                                >
+                                                  <path d="m8.315 13.859-3.182-3.417a.506.506 0 0 1 0-.684l.643-.683a.437.437 0 0 1 .642 0l2.22 2.393 4.942-5.327a.436.436 0 0 1 .643 0l.643.684a.504.504 0 0 1 0 .683l-5.91 6.35a.437.437 0 0 1-.642 0"></path>
+                                                </svg>
+                                              </span>
+                                            </span>
+                                          </span>
+                                        </span>
+                                        <span className="Polaris-Choice__Label">
+                                          {setting.label}
+                                        </span>
+                                      </label>
+                                      <div className="Polaris-Choice__Descriptions">
+                                        <div className="Polaris-Choice__HelpText">
+                                          Section settings
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </fieldset>
+                        </div>
+
+                        {/*  */}
+                        {/*  */}
+                        {/*  */}
+                      </div>
+                    </div>
+                  </div>
+                  {/* ================================ */}
+                  {/* Blocks */}
+                  {/* ================================ */}
+                  <div className="Polaris-Card__Section">
+                    <div className="Polaris-Card__SectionHeader">
+                      <h3 aria-label="Reports" className="Polaris-Subheading">
+                        Blocks
+                      </h3>
+                    </div>
+                    <div className="Polaris-FormLayout">
+                      <div className="Polaris-FormLayout__Items">
+                        <div className="Polaris-FormLayout__Item">
+                          <div className="">
+                            <div className="Polaris-Labelled__LabelWrapper">
+                              <div className="Polaris-Label">
+                                <label
+                                  htmlFor="block-type-input"
+                                  className="Polaris-Label__Text"
+                                >
+                                  Block type
+                                </label>
+                              </div>
+                            </div>
+                            <div className="Polaris-Connected">
+                              <div className="Polaris-Connected__Item Polaris-Connected__Item--primary">
                                 <div className="Polaris-TextField">
                                   <input
-                                    id="TextField1"
-                                    placeholder="Featured"
+                                    id="block-type-input"
+                                    autocomplete="off"
                                     className="Polaris-TextField__Input"
-                                    aria-labelledby="TextField1Label"
-                                    aria-invalid="false"
                                     type="text"
-                                    value={state?.section?.name}
+                                    placeholder="column-with-text"
                                     onChange={(e) =>
-                                      dispatch({
-                                        type: "SET_NAME",
-                                        payload: e.target.value,
-                                      })
+                                      setBlockType(e.target.value)
                                     }
+                                    value={blockType}
                                   />
                                   <div className="Polaris-TextField__Backdrop"></div>
                                 </div>
@@ -340,6 +506,136 @@ function App() {
                         </div>
                       </div>
                     </div>
+                    <div className="Polaris-FormLayout">
+                      <div className="Polaris-FormLayout__Items">
+                        {presetBlockSettings.map((setting) => {
+                          return (
+                            <div
+                              key={setting.id}
+                              className="Polaris-FormLayout__Item"
+                            >
+                              <div>
+                                <label
+                                  className="Polaris-Choice"
+                                  htmlFor={`block-setting-${setting.id}`}
+                                >
+                                  <span className="Polaris-Choice__Control">
+                                    <span className="Polaris-Checkbox">
+                                      <input
+                                        className="Polaris-Checkbox__Input"
+                                        type="checkbox"
+                                        id={`block-setting-${setting.id}`}
+                                        checked={blockSettings.some(
+                                          (existingSetting) =>
+                                            existingSetting.id === setting.id
+                                        )}
+                                        onChange={(e) =>
+                                          toggleBlockSetting(
+                                            e.target.checked,
+                                            setting
+                                          )
+                                        }
+                                      />
+                                      <span className="Polaris-Checkbox__Backdrop"></span>
+                                      <span className="Polaris-Checkbox__Icon">
+                                        <span className="Polaris-Icon">
+                                          <span className="Polaris-VisuallyHidden"></span>
+                                          <svg
+                                            viewBox="0 0 20 20"
+                                            className="Polaris-Icon__Svg"
+                                            focusable="false"
+                                            aria-hidden="true"
+                                          >
+                                            <path d="m8.315 13.859-3.182-3.417a.506.506 0 0 1 0-.684l.643-.683a.437.437 0 0 1 .642 0l2.22 2.393 4.942-5.327a.436.436 0 0 1 .643 0l.643.684a.504.504 0 0 1 0 .683l-5.91 6.35a.437.437 0 0 1-.642 0"></path>
+                                          </svg>
+                                        </span>
+                                      </span>
+                                    </span>
+                                  </span>
+                                  <span className="Polaris-Choice__Label">
+                                    {setting.label}
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="Polaris-FormLayout">
+                      <div className="Polaris-FormLayout__Items">
+                        <div className="Polaris-FormLayout__Item">
+                          <div>
+                            <button
+                              className="Polaris-Button Polaris-Button--primary"
+                              type="button"
+                              onClick={addBlock}
+                            >
+                              <span className="Polaris-Button__Content">
+                                <span className="Polaris-Button__Text">
+                                  Add
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="Polaris-FormLayout">
+                      <div className="Polaris-FormLayout__Items">
+                        <div className="Polaris-FormLayout__Item">
+                          <div>
+                            <ul className="Polaris-List">
+                              {state?.section?.blocks.map((block) => {
+                                return (
+                                  <>
+                                    <li
+                                      key={block.type}
+                                      className="Polaris-List__Item"
+                                    >
+                                      {block.type}
+                                      {block.settings.map((setting) => {
+                                        return (
+                                          <p
+                                            className="Polaris-Caption"
+                                            key={setting.id}
+                                          >
+                                            Type: {setting.type}
+                                          </p>
+                                        );
+                                      })}
+                                    </li>
+                                  </>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ================================ */}
+              {/* Code */}
+              {/* ================================ */}
+              <div className="Polaris-Layout__Section Polaris-Layout__Section--oneHalf">
+                <div className="Polaris-Card">
+                  <div className="Polaris-Card__Header">
+                    <h2 className="Polaris-Heading">Section file</h2>
+                  </div>
+                  <div className="Polaris-Card__Section">
+                    <pre>
+                      <code class="Polaris-TextStyle--variationCode">
+                        {result}
+                        {"{% schema %}"}
+                        <br />
+                        {JSON.stringify(resultJson, null, 2)}
+                        <br />
+                        {"{% endschema %}"}
+                      </code>
+                    </pre>
                   </div>
                 </div>
               </div>
@@ -348,89 +644,27 @@ function App() {
         </div>
       </div>
 
-      <br />
-
-      <h3>Section settings</h3>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {presetSectionSettings.map((setting) => {
-          return (
-            <div key={setting.id}>
-              <h4>
-                <label htmlFor={`section-setting-${setting.id}`}>
-                  Add {setting.label}
-                </label>
-              </h4>
-              <input
-                id={`section-setting-${setting.id}`}
-                type="checkbox"
-                checked={state?.section?.settings.some(
-                  (existingSetting) => existingSetting.id === setting.id
-                )}
-                onChange={(e) =>
-                  toggleSectionSetting(e.target.checked, setting)
-                }
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      <h3>Section blocks</h3>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
-        <label htmlFor="new-block-type">Add a new block type</label>
-        <input
-          id="new-block-type"
-          type="text"
-          placeholder="column-with-text"
-          onChange={(e) => setBlockType(e.target.value)}
-          value={blockType}
-        />
-        <button onClick={addBlock}>Add +</button>
-        {state?.section?.blocks.map((block) => {
-          return (
-            <div key={block.type}>
-              <pre>{block.type}</pre>
-              <hr />
-            </div>
-          );
-        })}
-        {/* {presetBlockTypes.map((blockType) => {
-          return (
-            <div key={blockType.id}>
-              <h4>
-                <label htmlFor={`section-blocks-${blockType}`}>
-                  Add {blockType}
-                </label>
-              </h4>
-              <input
-                id={`section-blocks-${blockType}`}
-                type="checkbox"
-                checked={state?.section?.blocks.some(
-                  (existingBlock) => existingBlock.type === blockType
-                )}
-                onChange={(e) =>
-                  toggleSectionBlocks(e.target.checked, blockType)
-                }
-              />
-            </div>
-          );
-        })} */}
-      </div>
-
-      <p>Content</p>
-      {/* <input type="checkbox" onClick={(e) => toggleContent(e.target.checked)} /> */}
-      <h3>Blocks</h3>
-      {/* <button onClick={addTextBlock}>Text</button> */}
-      {/* <button onClick={addImageBlock}>Image</button> */}
-      <br />
-      <pre>
-        {result}
-        {"{% schema %}"}
-        <br />
-        {JSON.stringify(resultJson, null, 2)}
-        <br />
-        {"{% endschema %}"}
-      </pre>
+      {/* <button onClick={addBlock}>Add +</button>
+      <h4>Added blocks</h4>
+      {state?.section?.blocks.map((block) => {
+        return (
+          <div key={block.type}>
+            <pre>
+              {block.type}
+              <br />
+              {block.settings.map((setting) => {
+                return (
+                  <div key={setting.id}>
+                    <span>Type: {setting.type}</span>
+                    <br />
+                  </div>
+                );
+              })}
+            </pre>
+            <hr />
+          </div>
+        );
+      })} */}
     </>
   );
 }
