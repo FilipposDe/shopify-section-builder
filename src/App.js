@@ -2,28 +2,103 @@ import React from "react";
 import { hot } from "react-hot-loader";
 import "./App.css";
 
+const presetSectionSettings = [
+  {
+    id: "margin",
+    label: "Margin (px)",
+    type: "text",
+    placeholder: "0px",
+    effect: {
+      type: "STYLE_DECLARATION",
+      declarationText: "margin: {{ section.settings.margin }}px;",
+    },
+  },
+  {
+    id: "padding",
+    label: "Padding (px)",
+    type: "text",
+    placeholder: "0px",
+    effect: {
+      type: "STYLE_DECLARATION",
+      declarationText: "padding: {{ section.settings.padding }}px;",
+    },
+  },
+];
+
 function App() {
-  const [name, setName] = React.useState("");
-  const [settings, setSettings] = React.useState([]);
+  const reducer = (state, action) => {
+    console.log(`Handling action`, action);
+    switch (action.type) {
+      case "SET_NAME": {
+        const name = action.payload;
+        const className = name.replace(/\s/g, "-").toLowerCase();
+        return {
+          ...state,
+          section: {
+            ...state?.section,
+            name: name,
+            className: className,
+          },
+        };
+      }
+      case "ADD_SECTION_SETTING": {
+        return {
+          ...state,
+          section: {
+            ...state?.section,
+            settings: [...state?.section?.settings, action.payload],
+          },
+        };
+      }
+      case "REMOVE_SECTION_SETTING": {
+        return {
+          ...state,
+          section: {
+            ...state?.section,
+            settings: [
+              ...state?.section?.settings?.filter(
+                (setting) => setting.id !== action.payload
+              ),
+            ],
+          },
+        };
+      }
+      default:
+        return state;
+    }
+  };
+
+  const initialState = {
+    section: {
+      name: "Custom section",
+      className: "custom-section",
+      settings: [],
+    },
+  };
+
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
   const getResult = () => {
     let result = "";
 
     // Style
     result += `<style>\n`;
-    if (settings.some((s) => s.id === "margin")) {
-      result += `  section.${name} {\n`;
-      result += `    margin: {{ section.settings.margin }}px;\n`;
-      result += `  }\n`;
+    result += `  section.${state?.section?.className} {\n`;
+    for (const setting of state?.section?.settings) {
+      if (setting.effect.type === "STYLE_DECLARATION") {
+        result += `    ${setting.effect.declarationText}\n`;
+      }
     }
+    result += `  }\n`;
+    result += "\n";
     result += `</style>\n`;
     result += "\n";
 
     // HTML
-    result += `<section className='section-${name}'>\n`;
-    if (settings.some((s) => s.id === "content")) {
-      result += `  {{ section.settings.content }}\n`;
-    }
+    result += `<section className='section-${state?.section?.className}'>\n`;
+    // if (settings.some((s) => s.id === "content")) {
+    //   result += `  {{ section.settings.content }}\n`;
+    // }
     result += "</section>\n";
     result += "\n";
 
@@ -32,92 +107,83 @@ function App() {
 
   const result = getResult();
 
-  function toggleMargin() {
-    if (!settings.some((s) => s.id === "margin")) {
-      const newSetting = {
-        type: "number",
-        id: "margin",
-        label: "Margin (px)",
-      };
-      setSettings([...settings, newSetting]);
+  function toggleSectionSetting(isChecked, settingData) {
+    // const hasAlreadyAdded = state?.section?.settings?.some(
+    //   (existingSetting) => existingSetting.id === settingData.id
+    // );
+
+    if (isChecked) {
+      dispatch({ type: "ADD_SECTION_SETTING", payload: settingData });
     } else {
-      setSettings(settings.filter((s) => s.id !== "margin"));
+      dispatch({ type: "REMOVE_SECTION_SETTING", payload: settingData.id });
     }
   }
 
-  function toggleContent() {
-    if (!settings.some((s) => s.id === "content")) {
-      const newSetting = {
-        type: "text",
-        id: "content",
-        label: "Content",
-      };
-      setSettings([...settings, newSetting]);
-    } else {
-      setSettings(settings.filter((s) => s.id !== "content"));
-    }
-  }
-
-  /**
-   * 
-   * {% schema %}
-    {
-    "name": "Slideshow"
-    }
-    {% endschema %}
-   */
-
+  // Schema
   const resultJson = {
-    name: name,
-    settings: [...settings],
+    name: state?.section?.name,
+    settings: [
+      ...state?.section?.settings.map((setting) => {
+        const { id, type, placeholder, label } = setting;
+        return { id, type, placeholder, label };
+      }),
+    ],
     presets: {
-      name: name,
+      name: state?.section?.name,
     },
   };
+
+  console.log({ state });
+
   return (
     <>
-      <div class="Polaris-Page">
-        <div class="Polaris-Page__Content">
-          <div class="Polaris-Layout">
-            <div class="Polaris-Layout__AnnotatedSection">
-              <div class="Polaris-Layout__AnnotationWrapper">
-                <div class="Polaris-Layout__Annotation">
-                  <div class="Polaris-TextContainer">
-                    <h2 class="Polaris-Heading">Form</h2>
+      <div className="Polaris-Page">
+        <div className="Polaris-Page__Content">
+          <div className="Polaris-Layout">
+            <div className="Polaris-Layout__AnnotatedSection">
+              <div className="Polaris-Layout__AnnotationWrapper">
+                <div className="Polaris-Layout__Annotation">
+                  <div className="Polaris-TextContainer">
+                    <h2 className="Polaris-Heading">Form</h2>
                     <p>A sample form using Polaris components.</p>
                   </div>
                 </div>
-                <div class="Polaris-Layout__AnnotationContent">
-                  <div class="Polaris-Card">
-                    <div class="Polaris-Card__Section">
-                      <div class="Polaris-FormLayout">
-                        <div role="group" class="">
-                          <div class="Polaris-FormLayout__Items">
-                            <div class="Polaris-FormLayout__Item">
-                              <div class="">
-                                <div class="Polaris-Labelled__LabelWrapper">
-                                  <div class="Polaris-Label">
+                <div className="Polaris-Layout__AnnotationContent">
+                  <div className="Polaris-Card">
+                    <div className="Polaris-Card__Section">
+                      <div className="Polaris-FormLayout">
+                        <div role="group" className="">
+                          <div className="Polaris-FormLayout__Items">
+                            <div className="Polaris-FormLayout__Item">
+                              <div className="">
+                                <div className="Polaris-Labelled__LabelWrapper">
+                                  <div className="Polaris-Label">
                                     <label
                                       id="TextField1Label"
-                                      for="TextField1"
-                                      class="Polaris-Label__Text"
+                                      htmlFor="TextField1"
+                                      className="Polaris-Label__Text"
                                     >
                                       Section name
                                     </label>
                                   </div>
                                 </div>
-                                <div class="Polaris-TextField">
+                                <div className="Polaris-TextField">
                                   <input
                                     id="TextField1"
                                     placeholder="Featured"
-                                    class="Polaris-TextField__Input"
+                                    className="Polaris-TextField__Input"
                                     aria-labelledby="TextField1Label"
                                     aria-invalid="false"
                                     type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    value={state?.section?.name}
+                                    onChange={(e) =>
+                                      dispatch({
+                                        type: "SET_NAME",
+                                        payload: e.target.value,
+                                      })
+                                    }
                                   />
-                                  <div class="Polaris-TextField__Backdrop"></div>
+                                  <div className="Polaris-TextField__Backdrop"></div>
                                 </div>
                               </div>
                             </div>
@@ -137,12 +203,26 @@ function App() {
       <br />
       <br />
 
-      <p>Add setting:</p>
+      <h2>Add Section settings</h2>
       <h3>Layout</h3>
-      <p>Margin</p>
-      <input type="checkbox" onClick={(e) => toggleMargin(e.target.checked)} />
+      {presetSectionSettings.map((setting) => {
+        return (
+          <div key={setting.id}>
+            <h4>Add {setting.label}</h4>
+            <input
+              id={`section-setting-${setting.id}`}
+              type="checkbox"
+              checked={state?.section?.settings.some(
+                (existingSetting) => existingSetting.id === setting.id
+              )}
+              onChange={(e) => toggleSectionSetting(e.target.checked, setting)}
+            />
+          </div>
+        );
+      })}
+
       <p>Content</p>
-      <input type="checkbox" onClick={(e) => toggleContent(e.target.checked)} />
+      {/* <input type="checkbox" onClick={(e) => toggleContent(e.target.checked)} /> */}
       <h3>Blocks</h3>
       {/* <button onClick={addTextBlock}>Text</button> */}
       {/* <button onClick={addImageBlock}>Image</button> */}
