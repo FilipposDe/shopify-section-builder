@@ -282,13 +282,23 @@ function App() {
     name: state?.section?.name,
     settings: [
       ...state?.section?.settings
-        .sort((a, b) => {
+        ?.sort((a, b) => {
           return a.index - b.index;
         })
-        .map((setting) => {
+        ?.map((setting) => {
           const { id, type, placeholder, label } = setting;
           return { id, type, placeholder, label };
         }),
+    ],
+    blocks: [
+      ...state?.section.blocks?.map((block) => {
+        const { type, settings } = block;
+        const cleanSettings = settings.map((setting) => {
+          const { id, type, placeholder, label } = setting;
+          return { id, type, placeholder, label };
+        });
+        return { type, settings: cleanSettings };
+      }),
     ],
     presets: {
       name: state?.section?.name,
@@ -395,10 +405,13 @@ function App() {
                             <legend className="Polaris-ChoiceList__Title">
                               Choose available settings for the section
                             </legend>
-                            <ul className="Polaris-ChoiceList__Choices">
+                            <ul className="Polaris-ChoiceList__Choices Polaris-Stack Polaris-Stack--spacingLoose Polaris-Stack--distributionFillEvenly">
                               {presetSectionSettings.map((setting) => {
                                 return (
-                                  <li key={setting.id}>
+                                  <li
+                                    key={setting.id}
+                                    className="Polaris-Stack__Item"
+                                  >
                                     <div>
                                       <label
                                         className="Polaris-Choice"
@@ -585,15 +598,15 @@ function App() {
                       <div className="Polaris-FormLayout__Items">
                         <div className="Polaris-FormLayout__Item">
                           <div>
-                            <ul className="Polaris-List">
+                            <div className="Polaris-Stack">
                               {state?.section?.blocks.map((block) => {
                                 return (
-                                  <>
-                                    <li
-                                      key={block.type}
-                                      className="Polaris-List__Item"
-                                    >
-                                      {block.type}
+                                  <div
+                                    key={block.type}
+                                    className="Polaris-Stack__Item"
+                                  >
+                                    <div className="">
+                                      <p>{block.type}</p>
                                       {block.settings.map((setting) => {
                                         return (
                                           <p
@@ -604,11 +617,11 @@ function App() {
                                           </p>
                                         );
                                       })}
-                                    </li>
-                                  </>
+                                    </div>
+                                  </div>
                                 );
                               })}
-                            </ul>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -626,7 +639,7 @@ function App() {
                     <h2 className="Polaris-Heading">Section file</h2>
                   </div>
                   <div className="Polaris-Card__Section">
-                    <pre>
+                    <pre style={{ width: "100%" }}>
                       <code class="Polaris-TextStyle--variationCode">
                         {result}
                         {"{% schema %}"}
@@ -643,28 +656,6 @@ function App() {
           </div>
         </div>
       </div>
-
-      {/* <button onClick={addBlock}>Add +</button>
-      <h4>Added blocks</h4>
-      {state?.section?.blocks.map((block) => {
-        return (
-          <div key={block.type}>
-            <pre>
-              {block.type}
-              <br />
-              {block.settings.map((setting) => {
-                return (
-                  <div key={setting.id}>
-                    <span>Type: {setting.type}</span>
-                    <br />
-                  </div>
-                );
-              })}
-            </pre>
-            <hr />
-          </div>
-        );
-      })} */}
     </>
   );
 }
