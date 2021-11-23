@@ -178,11 +178,11 @@ function App() {
   };
 
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const [blockType, setBlockType] = React.useState("column-with-text");
+  const [blockType, setBlockType] = React.useState("Column with text");
   const [blockSettings, setBlockSettings] = React.useState([]);
   const ref = React.useRef(null);
 
-  const getResult = () => {
+  const getResultHtml = () => {
     // Normalize CSS data
 
     // Get style settings only
@@ -219,6 +219,16 @@ function App() {
       ?.filter((setting) => setting.effect.type === "CONTENT")
       .sort((a, b) => a.order < b.order);
 
+    // const contentBlocksSettings = state?.section?.blocks?.map((block) => {
+    //   return block?.settings
+    //     ?.filter((setting) => setting.effect.type === "CONTENT")
+    //     .sort((a, b) => a.order < b.order);
+    // });
+    // //   .reduce((a, b) => {
+    // //     return { ...a, [b.type]: b };
+    // //   }, {});
+    // console.log({ contentBlocksSettings });
+
     // Main file building
 
     let result = "";
@@ -244,6 +254,26 @@ function App() {
       result += `  <div className="custom-${setting.id}">${setting.effect.code}</div>\n`;
     }
     // - - End section content
+    // - - Blocks content
+    if (state?.section?.blocks.length) {
+      result += `  <div className="custom-blocks">\n`;
+      result += `    {% for block in section.blocks %}\n`;
+      result += `      <div className="custom-block">\n`;
+      result += `        {% case block.type %}\n`;
+      for (const type of state.section.blocks.map((block) => block.type)) {
+        result += `          {% when '${type}' %}\n`;
+        for (const setting of state.section.blocks?.find(
+          (block) => block.type === type
+        )?.settings)
+          result += `            <div className="custom-block-${setting.id}">${setting.effect.code}</div>\n`;
+      }
+      result += `          {% else %}\n`;
+      result += `        {% endcase %}\n`;
+      result += `      </div>\n`;
+      result += `    {% endfor %}\n`;
+      result += `  </div>\n`;
+    }
+    // - - End blocks content
     result += "</section>\n";
     result += "\n";
     // - End Content
@@ -251,7 +281,7 @@ function App() {
     return result;
   };
 
-  const resultHtml = getResult();
+  const resultHtml = getResultHtml();
 
   function toggleSectionSetting(isChecked, settingData) {
     if (isChecked) {
@@ -265,7 +295,11 @@ function App() {
     e.preventDefault();
     dispatch({
       type: "ADD_SECTION_BLOCK",
-      payload: { type: blockType, settings: blockSettings },
+      payload: {
+        name: blockType,
+        type: blockType.replace(/\s/g, "-").toLowerCase(),
+        settings: blockSettings,
+      },
     });
   }
 
@@ -293,12 +327,12 @@ function App() {
     ],
     blocks: [
       ...state?.section.blocks?.map((block) => {
-        const { type, settings } = block;
+        const { type, settings, name } = block;
         const cleanSettings = settings.map((setting) => {
           const { id, type, placeholder, label } = setting;
           return { id, type, placeholder, label };
         });
-        return { type, settings: cleanSettings };
+        return { type, name, settings: cleanSettings };
       }),
     ],
     presets: [
@@ -623,7 +657,7 @@ function App() {
                                       <div className="Polaris-ResourceItem__Content">
                                         <h3>
                                           <span className="Polaris-TextStyle--variationStrong">
-                                            {block.type}
+                                            {block.name}
                                           </span>
                                         </h3>
                                         <br />
