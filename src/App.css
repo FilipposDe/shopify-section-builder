@@ -3,9 +3,10 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-pre {
-  /* padding: 10px;
-  background-color: #ccc; */
+code {
+  width: 100%;
+  padding: 20px;
+  overflow: scroll;
 }
 
 h3 + div,

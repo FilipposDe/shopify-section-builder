@@ -29,8 +29,8 @@ module.exports = {
       directory: path.join(__dirname, "public"),
       //   publicPath: "http://localhost:3005/dist/",
     },
+    hot: true,
     compress: true,
     port: 3005,
   },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
 };

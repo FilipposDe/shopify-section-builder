@@ -29,7 +29,7 @@ const presetSectionSettings = [
     id: "title",
     label: "Section title",
     type: "text",
-    placeholder: "",
+    placeholder: "Text here",
     effect: {
       type: "CONTENT",
       order: 1,
@@ -63,7 +63,7 @@ const presetSectionSettings = [
     id: "text",
     label: "Section text",
     type: "text",
-    placeholder: "",
+    placeholder: "Text here",
     effect: {
       type: "CONTENT",
       order: 2,
@@ -92,7 +92,7 @@ const presetBlockSettings = [
     id: "block_text",
     label: "Block text",
     type: "text",
-    placeholder: "",
+    placeholder: "Text here",
     effect: {
       type: "CONTENT",
       order: 2,
@@ -180,6 +180,7 @@ function App() {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const [blockType, setBlockType] = React.useState("column-with-text");
   const [blockSettings, setBlockSettings] = React.useState([]);
+  const ref = React.useRef(null);
 
   const getResult = () => {
     // Normalize CSS data
@@ -250,7 +251,7 @@ function App() {
     return result;
   };
 
-  const result = getResult();
+  const resultHtml = getResult();
 
   function toggleSectionSetting(isChecked, settingData) {
     if (isChecked) {
@@ -278,7 +279,7 @@ function App() {
     }
   }
   // Schema
-  const resultJson = {
+  const resultSchemaJson = {
     name: state?.section?.name,
     settings: [
       ...state?.section?.settings
@@ -300,12 +301,14 @@ function App() {
         return { type, settings: cleanSettings };
       }),
     ],
-    presets: {
-      name: state?.section?.name,
-    },
+    presets: [
+      {
+        name: state?.section?.name,
+      },
+    ],
   };
 
-  console.log({ state, resultJson });
+  console.log({ state, resultJson: resultSchemaJson });
 
   return (
     <>
@@ -363,7 +366,7 @@ function App() {
                                   <div className="Polaris-TextField">
                                     <input
                                       id="section-name-input"
-                                      autocomplete="off"
+                                      autoComplete="off"
                                       className="Polaris-TextField__Input"
                                       placeholder="Featured"
                                       type="text"
@@ -392,7 +395,7 @@ function App() {
                   <div className="Polaris-Card__Section">
                     <div className="Polaris-Card__SectionHeader">
                       <h3 aria-label="Reports" className="Polaris-Subheading">
-                        Section settings
+                        Add section settings
                       </h3>
                     </div>
                     <div className="Polaris-FormLayout">
@@ -475,12 +478,12 @@ function App() {
                     </div>
                   </div>
                   {/* ================================ */}
-                  {/* Blocks */}
+                  {/* Add blocks */}
                   {/* ================================ */}
                   <div className="Polaris-Card__Section">
                     <div className="Polaris-Card__SectionHeader">
                       <h3 aria-label="Reports" className="Polaris-Subheading">
-                        Blocks
+                        Add blocks
                       </h3>
                     </div>
                     <div className="Polaris-FormLayout">
@@ -594,36 +597,77 @@ function App() {
                         </div>
                       </div>
                     </div>
-                    <div className="Polaris-FormLayout">
-                      <div className="Polaris-FormLayout__Items">
-                        <div className="Polaris-FormLayout__Item">
-                          <div>
-                            <div className="Polaris-Stack">
-                              {state?.section?.blocks.map((block) => {
-                                return (
-                                  <div
-                                    key={block.type}
-                                    className="Polaris-Stack__Item"
-                                  >
-                                    <div className="">
-                                      <p>{block.type}</p>
-                                      {block.settings.map((setting) => {
-                                        return (
-                                          <p
-                                            className="Polaris-Caption"
-                                            key={setting.id}
-                                          >
-                                            Type: {setting.type}
-                                          </p>
-                                        );
-                                      })}
+                  </div>
+                  {/* ================================ */}
+                  {/* Added blocks */}
+                  {/* ================================ */}
+                  <div className="Polaris-Card__Section">
+                    <div className="Polaris-Card__SectionHeader">
+                      <h3 aria-label="Reports" className="Polaris-Subheading">
+                        Added blocks
+                      </h3>
+                    </div>
+
+                    <div className="Polaris-Card">
+                      <div className="Polaris-ResourceList__ResourceListWrapper">
+                        <ul className="Polaris-ResourceList" aria-live="polite">
+                          {state?.section?.blocks.map((block) => {
+                            return (
+                              <li
+                                key={block.type}
+                                className="Polaris-ResourceItem__ListItem"
+                              >
+                                <div className="Polaris-ResourceItem__ItemWrapper">
+                                  <div className="Polaris-ResourceItem ">
+                                    <div className="Polaris-ResourceItem__Container">
+                                      <div className="Polaris-ResourceItem__Content">
+                                        <h3>
+                                          <span className="Polaris-TextStyle--variationStrong">
+                                            {block.type}
+                                          </span>
+                                        </h3>
+                                        <br />
+                                        <div className="Polaris-Stack  Polaris-Stack--spacingExtraTight">
+                                          {block.settings?.map((setting) => {
+                                            return (
+                                              <div className="Polaris-Stack__Item">
+                                                <span className="Polaris-Badge">
+                                                  {setting.label}
+                                                </span>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                        <div className="Polaris-ResourceItem__Actions">
+                                          <div className="Polaris-ButtonGroup">
+                                            <div className="Polaris-ButtonGroup__Item Polaris-ButtonGroup__Item--plain">
+                                              <button
+                                                className="Polaris-Button Polaris-Button--plain"
+                                                data-polaris-unstyled="true"
+                                                onClick={(e) => {
+                                                  dispatch({
+                                                    type: "REMOVE_SECTION_BLOCK",
+                                                    payload: block.type,
+                                                  });
+                                                }}
+                                              >
+                                                <span className="Polaris-Button__Content">
+                                                  <span className="Polaris-Button__Text">
+                                                    Delete
+                                                  </span>
+                                                </span>
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
                       </div>
                     </div>
                   </div>
@@ -636,15 +680,47 @@ function App() {
               <div className="Polaris-Layout__Section Polaris-Layout__Section--oneHalf">
                 <div className="Polaris-Card">
                   <div className="Polaris-Card__Header">
-                    <h2 className="Polaris-Heading">Section file</h2>
+                    <div className="Polaris-Stack Polaris-Stack--alignmentBaseline">
+                      <div className="Polaris-Stack__Item Polaris-Stack__Item--fill">
+                        <h2 className="Polaris-Heading">Section file</h2>
+                      </div>
+                      <div className="Polaris-Stack__Item">
+                        <div className="Polaris-ButtonGroup">
+                          <div className="Polaris-ButtonGroup__Item Polaris-ButtonGroup__Item--plain">
+                            <button
+                              className="Polaris-Button Polaris-Button--plain"
+                              type="button"
+                              onClick={(e) => {
+                                const el = document.createElement("textarea");
+                                el.value = ref.current.innerText;
+                                document.body.appendChild(el);
+                                el.select();
+                                document.execCommand("copy");
+                                document.body.removeChild(el);
+                                alert("Copied!");
+                              }}
+                            >
+                              <span className="Polaris-Button__Content">
+                                <span className="Polaris-Button__Text">
+                                  Copy code
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className="Polaris-Card__Section">
                     <pre style={{ width: "100%" }}>
-                      <code class="Polaris-TextStyle--variationCode">
-                        {result}
+                      <code
+                        ref={ref}
+                        className="Polaris-TextStyle--variationCode"
+                      >
+                        {resultHtml}
                         {"{% schema %}"}
                         <br />
-                        {JSON.stringify(resultJson, null, 2)}
+                        {JSON.stringify(resultSchemaJson, null, 2)}
                         <br />
                         {"{% endschema %}"}
                       </code>
