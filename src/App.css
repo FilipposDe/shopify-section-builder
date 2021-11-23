@@ -5,8 +5,10 @@
 
 code {
   width: 100%;
-  padding: 20px;
+  padding: 20px !important;
+  line-height: 1.1 !important;
   overflow: scroll;
+  font-size: 12px !important;
 }
 
 h3 + div,
@@ -14,4 +16,8 @@ h4,
 input[type="checkbox"],
 label {
   display: inline-block;
+}
+
+.setting {
+  flex-basis: calc(25% - 0.8em);
 }
