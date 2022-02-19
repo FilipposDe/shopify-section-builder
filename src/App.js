@@ -1,5 +1,5 @@
 /* eslint-disable no-unreachable */
-import React from "react"
+import React, { useEffect } from "react"
 import { hot } from "react-hot-loader"
 import "@shopify/polaris/build/esm/styles.css"
 import "./App.css"
@@ -28,6 +28,10 @@ function App() {
     const [state, dispatch] = useStore()
     const ref = React.useRef(null)
 
+    useEffect(() => {
+        dispatch({ type: "INIT_CODE" })
+    }, [])
+
     function toggleSectionSetting(values) {
         const newSettings = values.map((id) =>
             presetSectionSettings.find((setting) => setting.id === id)
@@ -45,38 +49,6 @@ function App() {
             },
         })
     }
-
-    // Schema
-    const resultSchemaJson = {
-        name: state.name,
-        settings: [
-            ...state.settings
-                .sort((a, b) => {
-                    return a.index - b.index
-                })
-                .map((setting) => {
-                    const { id, type, placeholder, label } = setting
-                    return { id, type, placeholder, label }
-                }),
-        ],
-        blocks: [
-            ...state.blocks.map((block) => {
-                const { type, settings, name } = block
-                const cleanSettings = settings.map((setting) => {
-                    const { id, type, placeholder, label } = setting
-                    return { id, type, placeholder, label }
-                })
-                return { type, name, settings: cleanSettings }
-            }),
-        ],
-        presets: [
-            {
-                name: state.name,
-            },
-        ],
-    }
-
-    console.log({ state, resultJson: resultSchemaJson })
 
     return (
         <AppProvider i18n={enTranslations}>
@@ -99,31 +71,7 @@ function App() {
                                     }
                                 />
                             </Card.Section>
-                            <Card.Section title="2. Add section settings">
-                                <Heading>Style</Heading>
-                                <ChoiceList
-                                    allowMultiple
-                                    //   title="While the customer is checking out"
-                                    choices={presetSectionSettings
-                                        .filter(
-                                            (setting) =>
-                                                setting.effect.type ===
-                                                "STYLE_DECLARATION"
-                                        )
-                                        .map((setting) => ({
-                                            label: setting.label,
-                                            helpText:
-                                                setting.description ||
-                                                "Section settings",
-                                            value: setting.id,
-                                        }))}
-                                    onChange={(value) =>
-                                        toggleSectionSetting(value)
-                                    }
-                                    selected={state.settings?.map(
-                                        (existingSetting) => existingSetting.id
-                                    )}
-                                />
+                            {/* <Card.Section title="2. Add section settings">
                                 <Heading>Content</Heading>
                                 <ChoiceList
                                     allowMultiple
@@ -148,9 +96,9 @@ function App() {
                                         (existingSetting) => existingSetting.id
                                     )}
                                 />
-                            </Card.Section>
+                            </Card.Section> */}
 
-                            <CreateBlockForm onSubmit={addBlock} />
+                            {/* <CreateBlockForm onSubmit={addBlock} />
 
                             <Card.Section title="Your added blocks">
                                 <Card>
@@ -213,7 +161,7 @@ function App() {
                                         }}
                                     />
                                 </Card>
-                            </Card.Section>
+                            </Card.Section> */}
                         </Card>
                     </Layout.Section>
                     <Layout.Section oneHalf>
@@ -241,16 +189,8 @@ function App() {
                                         ref={ref}
                                         className="Polaris-TextStyle--variationCode"
                                     >
-                                        {state.code}
-                                        {"{% schema %}"}
-                                        <br />
-                                        {JSON.stringify(
-                                            resultSchemaJson,
-                                            null,
-                                            2
-                                        )}
-                                        <br />
-                                        {"{% endschema %}"}
+                                        {state.html}
+                                        {state.schema}
                                     </code>
                                 </pre>
                             </Card.Section>

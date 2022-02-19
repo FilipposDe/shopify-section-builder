@@ -1,28 +1,73 @@
 export const presetSectionSettings = [
+    /**
+     * Default style
+     */
     {
-        id: "margin",
-        label: "Margin (px)",
+        id: "padding-left",
+        label: "Padding left (px)",
         type: "number",
-        placeholder: "0px",
-        effect: {
-            type: "STYLE_DECLARATION",
-            selector: "SECTION",
-            declarationText: "margin: {{ section.settings.margin }}px;",
-        },
-        description: "Creates distance around the section",
+        placeholder: "0",
+        description: "Space left of the section",
     },
     {
-        id: "padding",
-        label: "Padding (px)",
+        id: "padding-right",
+        label: "Padding right (px)",
         type: "number",
-        placeholder: "0px",
-        effect: {
-            type: "STYLE_DECLARATION",
-            selector: "SECTION",
-            declarationText: "padding: {{ section.settings.padding }}px;",
-        },
-        description: "Creates distance around the section",
+        placeholder: "0",
+        description: "Space right of the section",
     },
+    {
+        id: "padding-top",
+        label: "Padding top (px)",
+        type: "number",
+        placeholder: "0",
+        description: "Space above the section",
+    },
+    {
+        id: "padding-bottom",
+        label: "Padding bottom (px)",
+        type: "number",
+        placeholder: "0",
+        description: "Space below the section",
+    },
+    {
+        id: "max-width",
+        label: "Max width (px)",
+        type: "number",
+        placeholder: "0",
+        description:
+            "Prevent from the section from being full width (inspect how the other sections of the theme behave)",
+    },
+    {
+        id: "media-breakpoint",
+        label: "Mobile breakpoint (px)",
+        type: "number",
+        placeholder: "0",
+        description:
+            "The point in which rows become vertical as the screen width becomes smaller (inspect how the other sections of the theme behave)",
+    },
+    {
+        id: "row-margin-bottom",
+        label: "Row bottom margin (px)",
+        type: "number",
+        placeholder: "0",
+        description: "Space below each row",
+    },
+    {
+        id: "text-color",
+        label: "Text color",
+        type: "color",
+        description: "Main section text color",
+    },
+    {
+        id: "bg-color",
+        label: "Background color",
+        type: "color",
+        description: "Main section background color",
+    },
+    /**
+     * Content
+     */
     {
         id: "title",
         label: "Section title",
@@ -31,11 +76,9 @@ export const presetSectionSettings = [
         effect: {
             type: "CONTENT",
             order: 1,
-            code: `
-    <h2>
+            code: `<h2>
       {{ section.settings.title }}
-    </h2>
-`,
+    </h2>\n`,
         },
         description: "Title of the entire section",
     },
@@ -59,7 +102,7 @@ export const presetSectionSettings = [
         effect: {
             type: "CONTENT",
             order: 1,
-            code: "{{ section.settings.html_title }}",
+            code: "{{ section.settings.html_title }}\n",
         },
     },
     {

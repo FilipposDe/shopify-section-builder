@@ -1,23 +1,23 @@
 import getResultHtml from "./resultHtml"
-
-const initialHtml = `<style>
-</style>
-
-<section>
-</section>
-
-`
+import getResultSchema from "./resultSchema"
 
 export const initialState = {
     name: "Custom section",
     className: "custom-section",
     settings: [],
     blocks: [],
-    code: initialHtml,
+    html: "",
 }
 
 export const reducer = (state, action) => {
     switch (action.type) {
+        case "INIT_CODE": {
+            return {
+                ...state,
+                html: getResultHtml(state),
+                schema: getResultSchema(state),
+            }
+        }
         case "SET_NAME": {
             const name = action.payload
             const className = name.replace(/\s/g, "-").toLowerCase()
@@ -26,21 +26,33 @@ export const reducer = (state, action) => {
                 name: name,
                 className: className,
             }
-            return { ...newState, code: getResultHtml(newState) }
+            return {
+                ...newState,
+                html: getResultHtml(newState),
+                schema: getResultSchema(newState),
+            }
         }
         case "SET_SECTION_SETTING": {
             const newState = {
                 ...state,
                 settings: [...action.payload],
             }
-            return { ...newState, code: getResultHtml(newState) }
+            return {
+                ...newState,
+                html: getResultHtml(newState),
+                schema: getResultSchema(newState),
+            }
         }
         case "ADD_SECTION_BLOCK": {
             const newState = {
                 ...state,
                 blocks: [...state.blocks, action.payload],
             }
-            return { ...newState, code: getResultHtml(newState) }
+            return {
+                ...newState,
+                html: getResultHtml(newState),
+                schema: getResultSchema(newState),
+            }
         }
         case "REMOVE_SECTION_BLOCK": {
             const newState = {
@@ -51,7 +63,11 @@ export const reducer = (state, action) => {
                     ),
                 ],
             }
-            return { ...newState, code: getResultHtml(newState) }
+            return {
+                ...newState,
+                html: getResultHtml(newState),
+                schema: getResultSchema(newState),
+            }
         }
         default:
             return state

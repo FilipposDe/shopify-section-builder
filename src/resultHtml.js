@@ -1,42 +1,53 @@
 import getLiquid from "./liquid"
 
 const getResultHtml = (state) => {
-    // Normalize CSS data
+    // /**
+    //  * Initial style
+    //  */
 
-    // Get settings and replace 'SECTION' with its class
-    const styleSettings = state.settings
-        .filter((setting) => setting.effect.type === "STYLE_DECLARATION")
-        .map((setting) => {
-            const newSetting = JSON.parse(JSON.stringify(setting))
-            if (newSetting.effect.selector === "SECTION") {
-                newSetting.effect.selector = `.section-${state.className}-{{ section.id }}`
-            }
-            return newSetting
-        })
+    // // Get settings and replace 'SECTION' with its class
+    // const styleSettings = state.settings
+    //     .filter((setting) => setting.effect.type === "STYLE_DECLARATION")
+    //     .map((setting) => {
+    //         const newSetting = JSON.parse(JSON.stringify(setting))
+    //         if (newSetting.effect.selector === "SECTION") {
+    //             newSetting.effect.selector = `.section-${state.className}-{{ section.id }}`
+    //         }
+    //         return newSetting
+    //     })
 
-    // Populate rules array
-    const cssRules = []
-    const selectors = styleSettings.map((setting) => setting.effect.selector)
-    const uniqueSelectors = Array.from(new Set(selectors))
-    for (const selector of uniqueSelectors) {
-        const cssRule = {
-            selector,
-        }
-        const declarations = styleSettings
-            .filter((setting) => setting.effect.selector === selector)
-            .map((setting) => setting.effect.declarationText)
-        cssRule.declarations = declarations
-        cssRules.push(cssRule)
-    }
+    // // Populate rules array
+    // const cssRules = []
+    // const selectors = styleSettings.map((setting) => setting.effect.selector)
+    // const uniqueSelectors = Array.from(new Set(selectors))
+    // for (const selector of uniqueSelectors) {
+    //     const cssRule = {
+    //         selector,
+    //     }
+    //     const declarations = styleSettings
+    //         .filter((setting) => setting.effect.selector === selector)
+    //         .map((setting) => setting.effect.declarationText)
+    //     cssRule.declarations = declarations
+    //     cssRules.push(cssRule)
+    // }
 
-    return getLiquid(cssRules)
+    // /**
+    //  * Content
+    //  */
+
+    // const contentSettings = state.settings
+    //     ?.filter((setting) => setting.effect.type === "CONTENT")
+    //     .sort((a, b) => a.order < b.order)
+
+    // const sectionContents = contentSettings.map(
+    //     (setting) => setting.effect.code
+    // )
+    // const blocks = []
+    // const sectionChildren = [...sectionContents, ...blocks]
+
+    return getLiquid(state.className)
 
     //     // Setup content settings
-
-    //     // Get and sort content lines
-    //     const contentSectionSettings = state.settings
-    //         ?.filter((setting) => setting.effect.type === "CONTENT")
-    //         .sort((a, b) => a.order < b.order)
 
     //     // const contentBlocksSettings = state.blocks?.map((block) => {
     //     //   return block?.settings
@@ -51,19 +62,6 @@ const getResultHtml = (state) => {
     //     // Main file building
 
     //     let result = ""
-    //     const selectorsToStyle = []
-    //     // - Style
-    //     result += `<style>\n`
-    //     for (const selector in selectorsToStyle) {
-    //         result += `  ${selector} {\n`
-    //         for (const declaration of selectorsToStyle[selector]) {
-    //             result += `    ${declaration}\n`
-    //         }
-    //         result += `  }\n`
-    //         result += "\n"
-    //     }
-    //     result += `</style>\n`
-    //     // - End Style
 
     //     // - Content
     //     result += `
